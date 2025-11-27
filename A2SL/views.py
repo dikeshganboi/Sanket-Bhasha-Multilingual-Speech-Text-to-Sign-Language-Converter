@@ -161,15 +161,18 @@ def process_english_for_sign_language(text):
     
     filtered_text = []
     for w in words:
-        path = w + ".mp4"
+        # Capitalize first letter to match video file names (e.g., H.mp4, Hello.mp4)
+        capitalized_word = w.capitalize()
+        path = capitalized_word + ".mp4"
         f = finders.find(path)
         # Splitting the word if its animation is not present in database
         if not f:
+            # Try uppercase for single characters
             for c in w:
-                filtered_text.append(c)
+                filtered_text.append(c.upper())
         # Otherwise animation of word
         else:
-            filtered_text.append(w)
+            filtered_text.append(capitalized_word)
     
     return filtered_text
 
