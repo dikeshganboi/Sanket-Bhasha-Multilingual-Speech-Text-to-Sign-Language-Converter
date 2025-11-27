@@ -40,10 +40,12 @@ if config('DEBUG', default=True, cast=bool):
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Read from environment in production, fallback for local dev
-SECRET_KEY = config('SECRET_KEY', default='3k7=!d39#4@_&5a6to&4=_=j(c^v0(vv91cj5+9e8+d4&+01jb')
+# SECRET_KEY must be provided via environment; no hardcoded default
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+# Default to False if not specified
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
