@@ -1,0 +1,1068 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="text-center mb-8">
+        
+        <h2 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 mb-4">
+            🌍 Sanket Bhasha: Multilingual Speech to Sign Language Converter
+        </h2>
+        <p class="text-gray-300 text-lg">Now supports 12+ Indian languages including Hindi, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, and Assamese! Enter text or speak into the microphone to see sign language animations</p>
+        
+        <!-- Mobile Compatibility Notice -->
+        <div id="mobileNotice" class="mt-3 bg-gradient-to-r from-green-600 to-teal-600 p-3 rounded-lg shadow-lg hidden">
+            <p class="text-white text-xs sm:text-sm flex items-start gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <span id="mobileNoticeText"></span>
+            </p>
+        </div>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+        <!-- Input Section -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
+            <h3 class="text-2xl font-bold text-yellow-400 mb-6 text-center">Input Text or Voice</h3>
+            
+            <form action="" method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Language Selection -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">🌐 Select Language / भाषा चुनें</label>
+                    <select name="language" id="languageSelect" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent" onchange="updateLanguage()">
+                        {% if supported_languages %}
+                            {% for code, info in supported_languages.items %}
+                                {% if info.active %}
+                                <option value="{{ code }}" {% if selected_language == code %}selected{% endif %}>
+                                    {{ info.flag }} {{ info.native_name }} ({{ info.name }})
+                                </option>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <option value="en">English</option>
+                            <option value="hi">हिंदी (Hindi)</option>
+                        {% endif %}
+                    </select>
+                </div>
+                
+                <!-- Text Input with Mic and Speaker -->
+                <div class="space-y-2">
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                        <input type="text" name="sen" id="speechToText" 
+                               placeholder="Type or speak..."
+                               class="flex-1 px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-sm sm:text-base"
+                               value="{% if original_text %}{{ original_text }}{% endif %}"
+                               oninput="updateCharCount()">
+                        
+                        <div class="flex space-x-2">
+                            <button type="button" onclick="clearText()" id="clearButton"
+                                    class="bg-red-500 hover:bg-red-600 text-white p-3 rounded-lg transition duration-300 flex items-center justify-center flex-1 sm:flex-initial"
+                                    title="Clear text / टेक्स्ट साफ़ करें">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                            
+                            <button type="button" onclick="record()" id="micButton"
+                                    class="mic-icon bg-yellow-400 hover:bg-yellow-500 text-gray-900 p-3 rounded-lg transition duration-300 flex items-center justify-center flex-1 sm:flex-initial"
+                                    title="Voice Input / आवाज़ से इनपुट">
+                                <img src="{% static 'mic3.png' %}" height="20" width="20" class="sm:h-6 sm:w-6" alt="Microphone">
+                            </button>
+                            
+                            <button type="button" onclick="speakText()" id="speakerButton"
+                                    class="bg-blue-400 hover:bg-blue-500 text-white p-3 rounded-lg transition duration-300 flex items-center justify-center flex-1 sm:flex-initial"
+                                    title="Listen to text / पाठ सुनें">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Character and Word Counter -->
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span id="charCount">0 characters</span>
+                        <span id="wordCount">0 words</span>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" id="convertButton"
+                            class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105">
+                        🔄 Convert to Sign Language
+                    </button>
+                    <p class="text-gray-400 text-xs mt-2">⌨️ Keyboard shortcut: Ctrl + Enter</p>
+                </div>
+            </form>
+            
+            <!-- Results Section -->
+            {% if original_text %}
+            <div class="mt-8 space-y-4">
+                <!-- Original Input -->
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-yellow-400 font-bold">📝 Original Input ({{ source_language_name }}):</h4>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="copyText('originalText', this)" class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded-lg transition duration-300 flex items-center gap-1" title="Copy text">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                <span class="text-xs">Copy</span>
+                            </button>
+                            <button type="button" onclick="speakOriginalText()" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg transition duration-300 flex items-center gap-1" title="Listen to original text">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                </svg>
+                                <span class="text-xs">Listen</span>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-white bg-gray-600 p-3 rounded" id="originalText">{{ original_text }}</p>
+                </div>
+                
+                <!-- Translation (if performed) -->
+                {% if translation_performed %}
+                <div class="bg-blue-700 p-4 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-yellow-400 font-bold">🔄 Translated to English:</h4>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="copyText('englishText', this)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg transition duration-300 flex items-center gap-1" title="Copy text">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                <span class="text-xs">Copy</span>
+                            </button>
+                            <button type="button" onclick="speakEnglishText()" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg transition duration-300 flex items-center gap-1" title="Listen to English translation">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                </svg>
+                                <span class="text-xs">Listen</span>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-white bg-blue-600 p-3 rounded" id="englishText">{{ english_text }}</p>
+                </div>
+                {% endif %}
+                
+                {% if words %}
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-yellow-400 font-bold">🎯 Key Words for Sign Language:</h4>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="shareResults()" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded-lg transition duration-300 flex items-center gap-1" title="Share results">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                                <span class="text-xs">Share</span>
+                            </button>
+                            <button type="button" onclick="downloadResults()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg transition duration-300 flex items-center gap-1" title="Download results">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                <span class="text-xs">Download</span>
+                            </button>
+                        </div>
+                    </div>
+                    <ul id="list" class="flex flex-wrap gap-2">
+                        {% for word in words %}
+                        <li class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm transition duration-300">{{ word }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            {% elif error %}
+            <div class="mt-8">
+                <div class="bg-red-700 p-4 rounded-lg">
+                    <h4 class="text-red-200 font-bold mb-2">⚠️ Error:</h4>
+                    <p class="text-red-100">{{ error }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Animation Section -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
+            <h3 class="text-2xl font-bold text-yellow-400 mb-6 text-center">Sign Language Animation</h3>
+            
+            <div class="text-center space-y-4">
+                <!-- Current Word Display -->
+                <div id="currentWordDisplay" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-lg sm:text-2xl font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-lg mb-4 text-center hidden">
+                    <span id="currentWord">Ready</span>
+                </div>
+                
+                <!-- Video Progress Bar -->
+                <div class="mb-4 hidden" id="progressContainer">
+                    <div class="flex justify-between text-[10px] sm:text-xs text-gray-400 mb-1">
+                        <span id="currentVideoNumber">Video 0 of 0</span>
+                        <span id="overallProgress">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div id="progressBar" class="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- Video Player (inline, custom-styled like a 3D stage) -->
+                <div class="video-stage rounded-2xl shadow-2xl">
+                    <video id="videoPlayer"
+                           class="video-surface pointer-events-none"
+                           preload="auto"
+                           playsinline webkit-playsinline
+                           disablepictureinpicture
+                           controlslist="nodownload noplaybackrate noremoteplayback nofullscreen"
+                           x-webkit-airplay="deny"
+                           oncontextmenu="return false;">
+                        <source src="" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                    <div class="video-glow" aria-hidden="true"></div>
+                </div>
+                
+                <!-- Enhanced Control Panel -->
+                <div class="space-y-4">
+                    <!-- Main Control Buttons -->
+                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 justify-center">
+                        <button onclick="playPause()" id="mainPlayButton"
+                                class="bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-bold py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition duration-300 text-sm sm:text-base">
+                            ⏯️ <span class="hidden sm:inline">Play/Pause</span><span class="sm:hidden">Play</span>
+                        </button>
+                        <button onclick="stopVideo()" 
+                                class="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-bold py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition duration-300 text-sm sm:text-base">
+                            ⏹️ Stop
+                        </button>
+                        <button onclick="restartVideo()" 
+                                class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition duration-300 text-sm sm:text-base">
+                            🔄 Restart
+                        </button>
+                        <button onclick="toggleFullscreen()" 
+                                class="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition duration-300 text-sm sm:text-base">
+                            ⛶ <span class="hidden sm:inline">Fullscreen</span><span class="sm:hidden">Full</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Advanced Controls -->
+                    <div class="bg-gray-700 p-4 rounded-lg space-y-3">
+                        <!-- Playback Speed -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <label class="text-gray-300 font-medium flex items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                Speed:
+                            </label>
+                            <div class="flex gap-1 sm:gap-2 flex-wrap">
+                                <button onclick="setSpeed(0.5, this)" class="speed-btn bg-gray-600 hover:bg-gray-500 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm flex-1 sm:flex-initial">0.5x</button>
+                                <button onclick="setSpeed(0.75, this)" class="speed-btn bg-gray-600 hover:bg-gray-500 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm flex-1 sm:flex-initial">0.75x</button>
+                                <button onclick="setSpeed(1, this)" class="speed-btn bg-blue-600 hover:bg-blue-500 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm flex-1 sm:flex-initial">1x</button>
+                                <button onclick="setSpeed(1.25, this)" class="speed-btn bg-gray-600 hover:bg-gray-500 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm flex-1 sm:flex-initial">1.25x</button>
+                                <button onclick="setSpeed(1.5, this)" class="speed-btn bg-gray-600 hover:bg-gray-500 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm flex-1 sm:flex-initial">1.5x</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Loop and Auto-play Options -->
+                        <div class="flex items-center justify-between">
+                            <label class="text-gray-300 font-medium flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Loop:
+                            </label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="loopToggle" class="sr-only peer" onchange="toggleLoop()">
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <label class="text-gray-300 font-medium flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Auto-play on convert:
+                            </label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="autoPlayToggle" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Keyboard Shortcuts Info -->
+                    <div class="bg-blue-900 bg-opacity-50 p-3 rounded-lg text-xs text-gray-300">
+                        <p class="font-bold text-blue-300 mb-1">⌨️ Video Shortcuts:</p>
+                        <div class="grid grid-cols-2 gap-1">
+                            <span>• Space: Play/Pause</span>
+                            <span>• R: Restart</span>
+                            <span>• S: Stop</span>
+                            <span>• F: Fullscreen</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Character and word counter
+    function updateCharCount() {
+        const text = document.getElementById('speechToText').value;
+        const charCount = text.length;
+        const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+        document.getElementById('charCount').textContent = charCount + ' characters';
+        document.getElementById('wordCount').textContent = wordCount + ' words';
+    }
+
+    // Clear text function
+    function clearText() {
+        document.getElementById('speechToText').value = '';
+        updateCharCount();
+    }
+
+    // Copy text to clipboard (robust, no reliance on global event)
+    function copyText(elementId, btnEl) {
+        const srcEl = document.getElementById(elementId);
+        const text = srcEl ? (srcEl.textContent || srcEl.value || '') : '';
+        if (!text) {
+            if (window.showToast) {
+                showToast('Nothing to copy', 'warning', 1800);
+            } else {
+                alert('Nothing to copy');
+            }
+            return;
+        }
+
+        // Prefer async clipboard API
+        const write = navigator.clipboard && navigator.clipboard.writeText
+            ? navigator.clipboard.writeText(text)
+            : Promise.reject('Clipboard API unavailable');
+
+        write.then(() => {
+            if (window.showToast) {
+                showToast('Text copied to clipboard! 📋', 'success', 2000);
+            }
+            // Visual feedback on the triggering button if provided
+            const btn = btnEl || null;
+            if (btn) {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg><span class="text-xs">Copied!</span>';
+                setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
+            }
+        }).catch(err => {
+            // Fallback for older browsers: create a temporary textarea
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.top = '-1000px';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                const ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                if (ok) {
+                    if (window.showToast) {
+                        showToast('Text copied to clipboard! 📋', 'success', 2000);
+                    }
+                    if (btnEl) {
+                        const originalHTML = btnEl.innerHTML;
+                        btnEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg><span class="text-xs">Copied!</span>';
+                        setTimeout(() => { btnEl.innerHTML = originalHTML; }, 2000);
+                    }
+                    return;
+                }
+                throw new Error('execCommand failed');
+            } catch (e) {
+                if (window.showToast) {
+                    showToast('Failed to copy text', 'error');
+                } else {
+                    alert('Failed to copy text: ' + (err && err.message ? err.message : err));
+                }
+            }
+        });
+    }
+
+    // Share results
+    function shareResults() {
+        const originalText = document.getElementById('originalText') ? document.getElementById('originalText').textContent : '';
+        const englishText = document.getElementById('englishText') ? document.getElementById('englishText').textContent : originalText;
+        const shareText = `Check out my sign language conversion on Sanket Bhasha!\n\nOriginal: ${originalText}\nEnglish: ${englishText}\n\nTry it at: ${window.location.origin}`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'Sanket Bhasha - Sign Language Conversion',
+                text: shareText,
+                url: window.location.href
+            }).then(() => {
+                if (window.showToast) {
+                    showToast('Shared successfully! 🎉', 'success');
+                }
+            }).catch(err => console.log('Error sharing:', err));
+        } else {
+            // Fallback - copy to clipboard
+            navigator.clipboard.writeText(shareText).then(() => {
+                if (window.showToast) {
+                    showToast('Results copied to clipboard! 📋 Share it with others.', 'success');
+                } else {
+                    alert('✅ Results copied to clipboard! You can now paste and share.');
+                }
+            });
+        }
+    }
+
+    // Download results as text file
+    function downloadResults() {
+        const originalText = document.getElementById('originalText') ? document.getElementById('originalText').textContent : '';
+        const englishText = document.getElementById('englishText') ? document.getElementById('englishText').textContent : originalText;
+        const words = Array.from(document.querySelectorAll('#list li')).map(li => li.textContent).join(', ');
+        
+        const content = `Sanket Bhasha - Sign Language Conversion Results\n${'='.repeat(50)}\n\nOriginal Text:\n${originalText}\n\nEnglish Translation:\n${englishText}\n\nSign Language Words:\n${words}\n\nGenerated on: ${new Date().toLocaleString()}\nWebsite: ${window.location.origin}\n`;
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sign-language-conversion.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        if (window.showToast) {
+            showToast('Results downloaded successfully! 💾', 'success');
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Detect mobile device and show appropriate notice
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                      (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
+        const isAndroid = /Android/.test(navigator.userAgent);
+        const isMobile = isIOS || isAndroid;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (isMobile) {
+            const noticeDiv = document.getElementById('mobileNotice');
+            const noticeText = document.getElementById('mobileNoticeText');
+            
+            if (noticeDiv && noticeText) {
+                if (isAndroid) {
+                    if (SpeechRecognition) {
+                        noticeText.innerHTML = '<strong>📱 Android Detected!</strong> Voice input is enabled. Using Chrome browser for best results!';
+                        noticeDiv.classList.remove('hidden');
+                    } else {
+                        noticeText.innerHTML = '<strong>📱 Android Detected!</strong> Please use <strong>Chrome browser</strong> to enable voice input. Or type manually!';
+                        noticeDiv.classList.remove('hidden');
+                        noticeDiv.classList.remove('from-green-600', 'to-teal-600');
+                        noticeDiv.classList.add('from-orange-600', 'to-amber-600');
+                    }
+                } else if (isIOS) {
+                    if (SpeechRecognition) {
+                        noticeText.innerHTML = '<strong>📱 iPhone/iPad Detected!</strong> Voice input enabled! You are using Chrome/Edge - perfect choice!';
+                        noticeDiv.classList.remove('hidden');
+                    } else {
+                        noticeText.innerHTML = '<strong>📱 iPhone/iPad Detected!</strong> Voice input works on <strong>Chrome or Edge browser</strong>. Using Safari? Please type your text manually.';
+                        noticeDiv.classList.remove('hidden');
+                        noticeDiv.classList.remove('from-green-600', 'to-teal-600');
+                        noticeDiv.classList.add('from-orange-600', 'to-amber-600');
+                    }
+                }
+            }
+        }
+        
+        // Keyboard shortcut for submit (Ctrl+Enter)
+        const textInput = document.getElementById('speechToText');
+        if (textInput) {
+            textInput.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    document.querySelector('form').submit();
+                }
+            });
+            
+            // Initialize character count
+            updateCharCount();
+        }
+        
+        // Form validation before submit
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const text = document.getElementById('speechToText').value.trim();
+                if (!text) {
+                    e.preventDefault();
+                    alert('⚠️ Please enter some text or use the microphone first!');
+                    return false;
+                }
+            });
+        }
+    });
+
+    // Multilingual Speech Recognition Configuration
+    const languageMap = {
+        'en': 'en-US',
+        'hi': 'hi-IN',
+        'mr': 'mr-IN',
+        'ta': 'ta-IN',
+        'te': 'te-IN',
+        'bn': 'bn-IN',
+        'kn': 'kn-IN',
+        'gu': 'gu-IN',
+        'ml': 'ml-IN',
+        'pa': 'pa-IN',
+        'or': 'or-IN',
+        'as': 'as-IN'
+    };
+    
+    const placeholderMap = {
+        'en': 'Type your message or click the microphone to speak...',
+        'hi': 'अपना संदेश टाइप करें या बोलने के लिए माइक्रोफ़ोन पर क्लिक करें...',
+        'mr': 'तुमचा संदेश टाइप करा किंवा बोलण्यासाठी माइक्रोफोनवर क्लिक करा...',
+        'ta': 'உங்கள் செய்தியைத் தட்டச்சு செய்க அல்லது பேச மைக்ரோஃபோனைக் கிளிக் செய்க...',
+        'te': 'మీ సందేశాన్ని టైప్ చేయండి లేదా మాట్లాడటానికి మైక్రోఫోన్ క్లిక్ చేయండి...',
+        'bn': 'আপনার বার্তা টাইপ করুন অথবা কথা বলতে মাইক্রোফোনে ক্লিক করুন...',
+        'kn': 'ನಿಮ್ಮ ಸಂದೇಶವನ್ನು ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಮಾತನಾಡಲು ಮೈಕ್ರೊಫೋನ್ ಕ್ಲಿಕ್ ಮಾಡಿ...',
+        'gu': 'તમારો સંદેશ લખો અથવા બોલવા માટે માઇક્રોફોન પર ક્લિક કરો...',
+        'ml': 'നിങ്ങളുടെ സന്ദേശം ടൈപ്പ് ചെയ്യുക അല്ലെങ്കിൽ സംസാരിക്കുന്നതിന് മൈക്രോഫോണിൽ ക്ലിക്ക് ചെയ്യുക...',
+        'pa': 'ਆਪਣਾ ਸੁਨੇਹਾ ਟਾਈਪ ਕਰੋ ਜਾਂ ਬੋਲਣ ਲਈ ਮਾਈਕ੍ਰੋਫੋਨ ਤੇ ਕਲਿਕ ਕਰੋ...',
+        'or': 'ଆପଣଙ୍କ ସନ୍ଦେଶକୁ ଟାଇପ୍ କରନ୍ତୁ କିମ୍ବା କହିବା ପାଇଁ ମାଇକ୍ରୋଫୋନ୍ କ୍ଲିକ୍ କରନ୍ତୁ |...',
+        'as': 'আপোনাৰ বাৰ্তা টাইপ কৰক বা কথা পাতিবলৈ মাইক্ৰ ফোনত ক্লিক কৰক...'
+    };
+    
+    // Update language for speech recognition
+    function updateLanguage() {
+        const selectedLang = document.getElementById('languageSelect').value;
+        console.log('Language changed to:', selectedLang);
+        
+        // Update placeholder text based on language
+        const textInput = document.getElementById('speechToText');
+        textInput.placeholder = placeholderMap[selectedLang] || placeholderMap['en'];
+    }
+    
+    // Enhanced speech recognition with multilingual support - MOBILE ENABLED
+    function record() {
+        // Detect device type
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                      (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
+        const isAndroid = /Android/.test(navigator.userAgent);
+        const isMobile = isIOS || isAndroid;
+
+        // Check if speech recognition is available
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognition) {
+            if (isIOS) {
+                alert('🎤 Speech recognition not available on iOS Safari.\n\nPlease:\n✓ Use Chrome or Edge browser on iPhone/iPad\n✓ Or type your text manually');
+            } else {
+                alert('⚠️ Speech recognition not supported in this browser.\n\nPlease use:\n✓ Chrome on Android\n✓ Chrome/Edge on Desktop');
+            }
+            return;
+        }
+
+        const selectedLang = document.getElementById('languageSelect').value;
+        const speechLang = languageMap[selectedLang] || 'en-US';
+
+        // Create recognition instance
+        const recognition = new SpeechRecognition();
+        recognition.lang = speechLang;
+        recognition.continuous = false;
+        recognition.interimResults = isMobile ? false : true; // Disable interim on mobile for stability
+        recognition.maxAlternatives = 1;
+
+        // Update button immediately - visual feedback
+        const micButton = document.getElementById('micButton');
+        micButton.style.backgroundColor = '#ef4444';
+        micButton.innerHTML = '<span style="color: white; font-size: 20px;">🎙️</span>';
+
+        let finalTranscript = ''; // Store complete text
+
+        recognition.onstart = function() {
+            console.log('🎤 Listening in', speechLang);
+            finalTranscript = ''; // Reset on start
+            if (window.showToast) {
+                const message = isMobile ? 'Listening... Speak now! (Tap mic again when done)' : 'Listening... Speak now! 🎤';
+                showToast(message, 'info', isMobile ? 3000 : 2000);
+            }
+        };
+
+        recognition.onresult = function(event) {
+            let interimTranscript = '';
+            
+            // Build complete transcript from all results
+            for (let i = 0; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript + ' ';
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+            
+            // Show real-time text: finalized + interim (current speaking)
+            const fullText = finalTranscript + interimTranscript;
+            document.getElementById('speechToText').value = fullText;
+            updateCharCount(); // Update counter
+            
+            console.log('📝 Speaking:', fullText);
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Speech error:', event.error);
+            if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                const msg = isMobile 
+                    ? '🎤 Microphone access denied.\n\nPlease:\n1. Go to browser settings\n2. Allow microphone permission\n3. Refresh the page'
+                    : '🎤 Please allow microphone access in your browser settings.';
+                alert(msg);
+            } else if (event.error === 'no-speech') {
+                if (window.showToast) {
+                    showToast('No speech detected. Try again! 🎤', 'warning', 2000);
+                } else {
+                    alert('🎤 No speech detected. Please try again and speak clearly.');
+                }
+            } else if (event.error === 'network') {
+                alert('⚠️ Network error. Check your internet connection.');
+            } else if (event.error === 'aborted') {
+                console.log('Speech recognition aborted');
+            } else {
+                if (window.showToast) {
+                    showToast('Speech error: ' + event.error, 'error');
+                } else {
+                    alert('⚠️ Speech error: ' + event.error);
+                }
+            }
+            resetMicButton();
+        };
+
+        recognition.onend = function() {
+            resetMicButton();
+        };
+
+        // Start immediately - no delays
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error('Failed to start recognition:', e);
+            alert('⚠️ Could not start microphone. Try again.');
+            resetMicButton();
+        }
+    }
+    
+    function resetMicButton() {
+        const micButton = document.getElementById('micButton');
+        micButton.style.backgroundColor = '#facc15';
+        micButton.innerHTML = '<img src="{% static "mic3.png" %}" height="24" width="24" alt="Microphone">';
+    }
+    
+    // Text-to-Speech functionality
+    let currentSpeech = null;
+    
+    // Language code mapping for speech synthesis
+    const ttsLanguageMap = {
+        'en': 'en-US',
+        'hi': 'hi-IN',
+        'mr': 'mr-IN',
+        'ta': 'ta-IN',
+        'te': 'te-IN',
+        'bn': 'bn-IN',
+        'kn': 'kn-IN',
+        'gu': 'gu-IN',
+        'ml': 'ml-IN',
+        'pa': 'pa-Guru-IN',
+        'or': 'or-IN',
+        'as': 'as-IN'
+    };
+    
+    function speakText() {
+        const text = document.getElementById('speechToText').value;
+        if (!text.trim()) {
+            alert('Please enter some text first! / कृपया पहले कुछ टेक्स्ट दर्ज करें!');
+            return;
+        }
+        
+        const selectedLang = document.getElementById('languageSelect').value;
+        const speechLang = ttsLanguageMap[selectedLang] || 'en-US';
+        
+        speakTextWithLanguage(text, speechLang);
+    }
+    
+    function speakOriginalText() {
+        const text = document.getElementById('originalText')?.innerText;
+        if (!text) return;
+        
+        const selectedLang = '{{ selected_language }}' || 'en';
+        const speechLang = ttsLanguageMap[selectedLang] || 'en-US';
+        
+        speakTextWithLanguage(text, speechLang);
+    }
+    
+    function speakEnglishText() {
+        const text = document.getElementById('englishText')?.innerText;
+        if (!text) return;
+        
+        speakTextWithLanguage(text, 'en-US');
+    }
+    
+    function speakTextWithLanguage(text, language) {
+        // Stop any ongoing speech
+        if (currentSpeech) {
+            window.speechSynthesis.cancel();
+        }
+        
+        // Check if speech synthesis is supported
+        if (!('speechSynthesis' in window)) {
+            alert('Text-to-speech is not supported in your browser. Please use Chrome, Edge, or Safari.');
+            return;
+        }
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Try to find a voice that matches the language
+        const voices = window.speechSynthesis.getVoices();
+        const languageCode = language.split('-')[0]; // Get base language code (e.g., 'hi' from 'hi-IN')
+        
+        // Find a matching voice
+        let selectedVoice = voices.find(voice => voice.lang.startsWith(language));
+        if (!selectedVoice) {
+            selectedVoice = voices.find(voice => voice.lang.startsWith(languageCode));
+        }
+        
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        }
+        
+        utterance.lang = language;
+        utterance.rate = 0.9; // Slightly slower for better clarity
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        // Visual feedback
+        const speakerButton = document.getElementById('speakerButton');
+        if (speakerButton) {
+            speakerButton.style.backgroundColor = '#ef4444'; // Red while speaking
+        }
+        
+        utterance.onend = function() {
+            currentSpeech = null;
+            if (speakerButton) {
+                speakerButton.style.backgroundColor = '#60a5fa'; // Back to blue
+            }
+        };
+        
+        utterance.onerror = function(event) {
+            console.error('Speech synthesis error:', event);
+            alert('Unable to play speech. Please check your browser settings.');
+            currentSpeech = null;
+            if (speakerButton) {
+                speakerButton.style.backgroundColor = '#60a5fa';
+            }
+        };
+        
+        currentSpeech = utterance;
+        window.speechSynthesis.speak(utterance);
+        
+        console.log('Speaking text in language:', language);
+    }
+    
+    // Load voices when they become available
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = function() {
+            const voices = window.speechSynthesis.getVoices();
+            console.log('Available voices:', voices.length);
+        };
+    }
+	// Global video state
+	let videoState = {
+		i: 0,
+		videoCount: 0,
+		videoSource: [],
+		videos: null,
+		isLooping: false,
+		playbackSpeed: 1,
+		handlerAttached: false
+	};
+
+	// Update progress bar and current word display
+	function updateProgress() {
+		const progress = ((videoState.i + 1) / videoState.videoCount) * 100;
+		document.getElementById('progressBar').style.width = progress + '%';
+		document.getElementById('currentVideoNumber').textContent = `Video ${videoState.i + 1} of ${videoState.videoCount}`;
+		document.getElementById('overallProgress').textContent = Math.round(progress) + '%';
+		
+		// Update current word display
+		if (videoState.videos && videoState.i < videoState.videos.length) {
+			const currentWord = videoState.videos[videoState.i].innerHTML;
+			document.getElementById('currentWord').textContent = currentWord.toUpperCase();
+			document.getElementById('currentWordDisplay').classList.remove('hidden');
+		}
+	}
+
+	// Stop video playback
+	function stopVideo() {
+		document.getElementById('videoPlayer').pause();
+		videoState.i = 0;
+		if (videoState.videos) {
+			for (let j = 0; j < videoState.videos.length; j++) {
+				videoState.videos[j].style.color = '#feda6a';
+				videoState.videos[j].style.fontSize = '20px';
+			}
+		}
+		updateProgress();
+		document.getElementById('currentWord').textContent = 'Stopped';
+	}
+
+	// Restart video from beginning
+	function restartVideo() {
+		stopVideo();
+		if (document.getElementById('autoPlayToggle').checked) {
+			setTimeout(() => play(), 300);
+		}
+	}
+
+	// Set playback speed
+    function setSpeed(speed, btnEl) {
+		videoState.playbackSpeed = speed;
+		document.getElementById('videoPlayer').playbackRate = speed;
+		
+		// Update button styles
+		document.querySelectorAll('.speed-btn').forEach(btn => {
+			btn.classList.remove('bg-blue-600');
+			btn.classList.add('bg-gray-600');
+		});
+        if (btnEl) {
+            btnEl.classList.remove('bg-gray-600');
+            btnEl.classList.add('bg-blue-600');
+        }
+		
+		if (window.showToast) {
+			showToast(`Playback speed: ${speed}x ⚡`, 'info', 1500);
+		}
+	}
+
+	// Toggle loop mode
+	function toggleLoop() {
+		videoState.isLooping = document.getElementById('loopToggle').checked;
+		if (window.showToast) {
+			const message = videoState.isLooping ? 'Loop mode enabled 🔁' : 'Loop mode disabled';
+			showToast(message, 'info', 1500);
+		}
+	}
+
+	// Toggle fullscreen
+	function toggleFullscreen() {
+		const videoContainer = document.querySelector('.video-stage');
+		if (!document.fullscreenElement) {
+			if (videoContainer.requestFullscreen) {
+				videoContainer.requestFullscreen();
+			} else if (videoContainer.webkitRequestFullscreen) {
+				videoContainer.webkitRequestFullscreen();
+			} else if (videoContainer.msRequestFullscreen) {
+				videoContainer.msRequestFullscreen();
+			}
+		} else {
+			if (document.exitFullscreen) {
+				document.exitFullscreen();
+			}
+		}
+	}
+
+	function play()
+	{
+		videoState.videoSource = [];
+		videoState.videos = document.getElementById("list").getElementsByTagName("li");
+		var j;
+		for(j=0;j<videoState.videos.length;j++)
+		{
+			videoState.videoSource[j] = "/static/" + videoState.videos[j].innerHTML +".mp4";
+		}
+
+		videoState.i = 0;
+		videoState.videoCount = videoState.videoSource.length;
+		
+		// Show progress container
+		document.getElementById('progressContainer').classList.remove('hidden');
+		updateProgress();
+
+		function videoPlay(videoNum)
+		{
+			// Reset all words
+			for (let k = 0; k < videoState.videos.length; k++) {
+				videoState.videos[k].style.color = "#feda6a";
+				videoState.videos[k].style.fontSize = "20px";
+			}
+			
+			// Highlight current word
+			videoState.videos[videoNum].style.color = "#09edc7";
+			videoState.videos[videoNum].style.fontSize = "xx-large";
+			
+			document.getElementById("videoPlayer").setAttribute("src", videoState.videoSource[videoNum]);
+	    	document.getElementById("videoPlayer").load();
+	    	document.getElementById("videoPlayer").playbackRate = videoState.playbackSpeed;
+	    	document.getElementById("videoPlayer").play();
+	    	updateProgress();
+		}
+		
+		// Handler for video ended event
+		function myHandler()
+		{
+			videoState.videos[videoState.i].style.color = "#feda6a";
+			videoState.videos[videoState.i].style.fontSize = "20px";
+			videoState.i++;
+	    	if (videoState.i == videoState.videoCount)
+	    	{
+	    		if (videoState.isLooping) {
+	    			// Loop back to start
+	    			videoState.i = 0;
+	    			videoPlay(0);
+	    		} else {
+	    			document.getElementById("videoPlayer").pause();
+	    			document.getElementById('currentWord').textContent = 'Complete! ✓';
+	    		}
+	    	}
+	     	else
+	     	{
+	        	videoPlay(videoState.i);
+	    	}
+		}
+		
+		// Attach event listener only once
+		if (!videoState.handlerAttached) {
+			document.getElementById('videoPlayer').addEventListener('ended', myHandler, false);
+			videoState.handlerAttached = true;
+		}
+		
+		// Start playing from first video
+		videoPlay(0);
+	}
+	function playPause(){
+  		if (document.getElementById("videoPlayer").paused){
+    		play();}
+  		else{
+    		document.getElementById("videoPlayer").pause();}
+		}
+	
+	// Keyboard shortcuts for video controls
+	document.addEventListener('keydown', function(e) {
+		// Only handle shortcuts when not typing in input fields
+		if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+			return;
+		}
+		
+		switch(e.key.toLowerCase()) {
+			case ' ': // Space for play/pause
+				e.preventDefault();
+				playPause();
+				break;
+			case 'r': // R for restart
+				e.preventDefault();
+				restartVideo();
+				break;
+			case 's': // S for stop
+				e.preventDefault();
+				stopVideo();
+				break;
+			case 'f': // F for fullscreen
+				e.preventDefault();
+				toggleFullscreen();
+				break;
+		}
+	});
+	
+	// Auto-play on page load if results exist
+	document.addEventListener('DOMContentLoaded', function() {
+		const wordList = document.getElementById('list');
+		if (wordList && wordList.getElementsByTagName('li').length > 0) {
+			if (document.getElementById('autoPlayToggle').checked) {
+				setTimeout(() => play(), 500);
+			}
+		}
+	});
+
+        // Prevent accidental fullscreen on iOS by blocking clicks on the video element (controls are external)
+        document.addEventListener('DOMContentLoaded', function() {
+            const vid = document.getElementById('videoPlayer');
+            if (!vid) return;
+            vid.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); }, true);
+        });
+
+    </script>
+
+    <style>
+        /* 3D-like stage styling to make the animation feel generated rather than a plain video */
+        .video-stage {
+            position: relative;
+            background: radial-gradient(120% 120% at 50% 40%, rgba(16,185,129,0.25) 0%, rgba(59,130,246,0.15) 35%, rgba(17,24,39,0.85) 80%);
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            border: 1px solid rgba(255,255,255,0.06);
+            max-width: 100%;
+        }
+        .video-surface {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transform: perspective(1000px) rotateX(0.75deg);
+            filter: drop-shadow(0 12px 24px rgba(0,0,0,0.45));
+            border-radius: 1rem;
+        }
+        .video-glow {
+            position: absolute;
+            inset: -20%;
+            background: radial-gradient(closest-side, rgba(255,255,255,0.08), transparent 60%);
+            pointer-events: none;
+            mix-blend-mode: screen;
+            animation: subtlePulse 6s ease-in-out infinite;
+        }
+        @keyframes subtlePulse {
+            0%,100% { opacity: 0.35; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.03); }
+        }
+        
+        /* Mobile Responsive Optimizations */
+        @media (max-width: 640px) {
+            .video-surface {
+                transform: perspective(500px) rotateX(0.5deg);
+                filter: drop-shadow(0 6px 12px rgba(0,0,0,0.35));
+            }
+            /* Smaller padding for mobile */
+            .bg-gray-800 {
+                padding: 1rem !important;
+            }
+            /* Adjust text sizes for mobile */
+            h2, h3 {
+                font-size: 1.25rem !important;
+            }
+            /* Make word list more compact on mobile */
+            #list li {
+                font-size: 0.75rem !important;
+                padding: 0.25rem 0.5rem !important;
+            }
+        }
+        
+        /* Tablet optimizations */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .video-surface {
+                transform: perspective(750px) rotateX(0.6deg);
+            }
+        }
+        
+        /* Ensure buttons don't shrink too much */
+        button {
+            min-width: fit-content;
+        }
+        
+        /* Make sure text doesn't overflow */
+        * {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+    </style>
+
+{% endblock %}

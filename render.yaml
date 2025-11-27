@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: sanket-bhasha-isl
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn A2SL.wsgi:application"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: DATABASE_ENGINE
+        value: django.db.backends.postgresql
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: sanket-bhasha-db
+          property: database
+      - key: DATABASE_USER
+        fromDatabase:
+          name: sanket-bhasha-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: sanket-bhasha-db
+          property: password
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: sanket-bhasha-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: sanket-bhasha-db
+          property: port
+
+databases:
+  - name: sanket-bhasha-db
+    databaseName: sanket_bhasha_db
+    user: sanket_bhasha_user

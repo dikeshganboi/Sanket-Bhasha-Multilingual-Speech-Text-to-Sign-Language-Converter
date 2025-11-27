@@ -1,0 +1,521 @@
+{% extends 'base.html' %} {% block content %}
+<div class="fade-in max-w-5xl mx-auto space-y-16">
+  <!-- Hero -->
+  <section id="hero" class="text-center space-y-4">
+    <h1
+      class="text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500"
+    >
+      About Our Project
+    </h1>
+    <p class="text-gray-300 max-w-3xl mx-auto leading-relaxed">
+      We bridge spoken & written multilingual input to Indian Sign Language
+      (ISL) with an accessible, fast, education‑ready platform.
+    </p>
+    <div class="flex flex-wrap justify-center gap-2 text-xs">
+      <span class="bg-gray-800 px-3 py-1 rounded-full">Version 1.0.0</span>
+      <span class="bg-gray-800 px-3 py-1 rounded-full"
+        >Accessibility First</span
+      >
+      <span class="bg-gray-800 px-3 py-1 rounded-full">Real‑Time</span>
+      <span class="bg-gray-800 px-3 py-1 rounded-full">Multilingual</span>
+    </div>
+  </section>
+
+  <!-- In‑page Navigation -->
+  <nav
+    aria-label="About navigation"
+    class="sticky top-0 z-10 backdrop-blur bg-gray-900/70 border border-gray-700 rounded-xl p-3 flex flex-wrap gap-3 justify-center text-sm"
+  >
+    <a href="#mission" class="hover:text-yellow-400 transition">Mission</a>
+    <a href="#team" class="hover:text-yellow-400 transition">Team</a>
+    <a href="#testimonials" class="hover:text-yellow-400 transition">Impact</a>
+    <a href="#features" class="hover:text-yellow-400 transition">Features</a>
+    <a href="#stack" class="hover:text-yellow-400 transition">Tech Stack</a>
+    <a href="#accessibility" class="hover:text-yellow-400 transition"
+      >Accessibility</a
+    >
+    <a href="#faq" class="hover:text-yellow-400 transition">FAQ</a>
+    <a href="#roadmap" class="hover:text-yellow-400 transition">Roadmap</a>
+    <a href="#thanks" class="hover:text-yellow-400 transition">Thanks</a>
+    <a href="#contactcta" class="hover:text-yellow-400 transition">Contact</a>
+  </nav>
+
+  <!-- Mission -->
+  <section id="mission" class="space-y-4 text-center">
+    <h2 class="text-2xl font-bold text-yellow-400">Our Mission</h2>
+    <p class="text-lg text-gray-300 leading-relaxed">
+      We are a passionate team dedicated to removing communication barriers for
+      the deaf and hard‑of‑hearing community through intuitive ISL translation
+      technology.
+    </p>
+  </section>
+
+  <!-- Team -->
+  <section id="team" class="bg-gray-800 p-6 rounded-xl shadow space-y-6">
+    <h2 class="text-2xl font-bold text-yellow-400 text-center">Creator Team</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div class="bg-gray-700 p-4 rounded-lg text-center">
+        <div class="text-2xl mb-2">👨‍💻</div>
+        <h3 class="font-semibold text-white">Dikesh Ganboi</h3>
+        <p class="text-gray-300 text-sm">Project Lead & Developer</p>
+      </div>
+      <div class="bg-gray-700 p-4 rounded-lg text-center">
+        <div class="text-2xl mb-2">🎨</div>
+        <h3 class="font-semibold text-white">Harsh Patel</h3>
+        <p class="text-gray-300 text-sm">Frontend Engineer</p>
+      </div>
+      <div class="bg-gray-700 p-4 rounded-lg text-center">
+        <div class="text-2xl mb-2">🛠️</div>
+        <h3 class="font-semibold text-white">Dipak Surnar</h3>
+        <p class="text-gray-300 text-sm">Backend Engineer</p>
+      </div>
+      <div class="bg-gray-700 p-4 rounded-lg text-center">
+        <div class="text-2xl mb-2">🧭</div>
+        <h3 class="font-semibold text-white">Dikesh Ganboi</h3>
+        <p class="text-gray-300 text-sm">UX Direction</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Impact / Testimonials -->
+  <section id="testimonials" class="space-y-10">
+    <div class="text-center space-y-3">
+      <h2 class="text-2xl font-bold text-yellow-400">Impact Stories</h2>
+      <p class="text-gray-300 text-sm max-w-2xl mx-auto">
+        Early educators, learners, and accessibility advocates share how the
+        platform helps bridge communication in classrooms and daily learning.
+      </p>
+    </div>
+
+    <!-- Spotlight Rotating Highlight -->
+    <div
+      id="testimonialSpotlight"
+      class="relative bg-gray-800 rounded-xl p-6 overflow-hidden"
+    >
+      <div data-slide class="space-y-3">
+        <p class="text-lg font-semibold text-yellow-300">
+          “Students stayed engaged 40% longer once signs appeared alongside
+          spoken explanations.”
+        </p>
+        <div class="flex items-center gap-3 text-sm text-gray-300">
+          <span class="font-medium">Anita Sharma</span>
+          <span class="opacity-70">Special Educator (Delhi)</span>
+          <span class="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded"
+            >+40% engagement</span
+          >
+        </div>
+      </div>
+      <div data-slide class="space-y-3 hidden">
+        <p class="text-lg font-semibold text-yellow-300">
+          “Realtime voice to ISL reduced my prep time for inclusive lessons.”
+        </p>
+        <div class="flex items-center gap-3 text-sm text-gray-300">
+          <span class="font-medium">Rahul Verma</span>
+          <span class="opacity-70">STEM Tutor</span>
+          <span class="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded"
+            >‑1.5h planning</span
+          >
+        </div>
+      </div>
+      <div data-slide class="space-y-3 hidden">
+        <p class="text-lg font-semibold text-yellow-300">
+          “My daughter follows complex words better with the keyword sign
+          extraction.”
+        </p>
+        <div class="flex items-center gap-3 text-sm text-gray-300">
+          <span class="font-medium">Priya Nair</span>
+          <span class="opacity-70">Parent</span>
+          <span class="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded"
+            >Improved comprehension</span
+          >
+        </div>
+      </div>
+      <div class="absolute inset-x-0 bottom-0 h-1 bg-gray-700">
+        <div
+          id="testimonialProgress"
+          class="h-full bg-gradient-to-r from-yellow-400 to-orange-500 w-0"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Testimonial Cards -->
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="bg-gray-800 rounded-xl p-5 space-y-3">
+        <div class="text-3xl">🏫</div>
+        <p class="text-sm text-gray-300">
+          “Works smoothly on the classroom smart TV; students ask more questions
+          now.”
+        </p>
+        <div class="text-xs text-yellow-300">School IT Coordinator</div>
+      </div>
+      <div class="bg-gray-800 rounded-xl p-5 space-y-3">
+        <div class="text-3xl">🧒</div>
+        <p class="text-sm text-gray-300">
+          “I can learn new science words faster when I see the sign.”
+        </p>
+        <div class="text-xs text-yellow-300">Student (Age 12)</div>
+      </div>
+      <div class="bg-gray-800 rounded-xl p-5 space-y-3">
+        <div class="text-3xl">🤲</div>
+        <p class="text-sm text-gray-300">
+          “A practical assistive tool—low friction and respectful of privacy.”
+        </p>
+        <div class="text-xs text-yellow-300">Accessibility Advocate</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="space-y-6">
+    <h2 class="text-2xl font-bold text-yellow-400 text-center">Key Features</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="text-center bg-gray-800 p-5 rounded-xl">
+        <div class="text-4xl mb-3">🎙️</div>
+        <h3 class="font-semibold text-yellow-300 mb-2">Speech Recognition</h3>
+        <p class="text-xs text-gray-400">
+          Real‑time multilingual voice to text.
+        </p>
+      </div>
+      <div class="text-center bg-gray-800 p-5 rounded-xl">
+        <div class="text-4xl mb-3">🎥</div>
+        <h3 class="font-semibold text-yellow-300 mb-2">Sign Animations</h3>
+        <p class="text-xs text-gray-400">
+          Sequential playback with speed & loop.
+        </p>
+      </div>
+      <div class="text-center bg-gray-800 p-5 rounded-xl">
+        <div class="text-4xl mb-3">🤝</div>
+        <h3 class="font-semibold text-yellow-300 mb-2">Accessibility</h3>
+        <p class="text-xs text-gray-400">High contrast responsive design.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section id="stack" class="bg-gray-800 p-6 rounded-xl shadow space-y-4">
+    <h2 class="text-2xl font-bold text-yellow-400">Technology Stack</h2>
+    <div class="grid sm:grid-cols-2 gap-4 text-sm text-gray-300">
+      <ul class="space-y-1">
+        <li><span class="text-yellow-300">Backend:</span> Django (Python)</li>
+        <li><span class="text-yellow-300">NLP:</span> Keyword extraction</li>
+        <li><span class="text-yellow-300">Speech:</span> Web Speech API</li>
+        <li><span class="text-yellow-300">UI:</span> Tailwind CSS</li>
+      </ul>
+      <ul class="space-y-1">
+        <li><span class="text-yellow-300">Media:</span> Optimized MP4 signs</li>
+        <li><span class="text-yellow-300">Feedback:</span> Toast system</li>
+        <li><span class="text-yellow-300">Planned:</span> PWA offline cache</li>
+        <li><span class="text-yellow-300">Planned:</span> Saved sessions</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Accessibility -->
+  <section
+    id="accessibility"
+    class="bg-gray-800 p-6 rounded-xl shadow space-y-4"
+  >
+    <h2 class="text-2xl font-bold text-yellow-400">Accessibility Commitment</h2>
+    <p class="text-gray-300 text-sm">
+      Progress toward WCAG AA: contrast, keyboard shortcuts, semantic structure,
+      reduced motion (planned).
+    </p>
+    <div class="flex flex-wrap gap-2 text-xs">
+      <span class="bg-gray-700 px-2 py-1 rounded">Contrast ✓</span>
+      <span class="bg-gray-700 px-2 py-1 rounded">Responsive ✓</span>
+      <span class="bg-gray-700 px-2 py-1 rounded">Keyboard ✓</span>
+      <span class="bg-gray-700 px-2 py-1 rounded">Reduced Motion →</span>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="space-y-6">
+    <h2 class="text-2xl font-bold text-yellow-400 text-center">FAQ</h2>
+    <!-- FAQ Search -->
+    <div
+      class="max-w-md mx-auto flex items-center gap-2 bg-gray-800 p-3 rounded-lg"
+    >
+      <input
+        id="faqSearch"
+        type="text"
+        aria-label="Search FAQs"
+        placeholder="Search questions..."
+        class="flex-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+      />
+      <button
+        id="faqClear"
+        class="bg-gray-700 hover:bg-gray-600 text-sm px-3 py-2 rounded"
+        type="button"
+      >
+        Clear
+      </button>
+    </div>
+    <p id="faqResults" class="text-center text-xs text-gray-400">
+      Showing all FAQs
+    </p>
+    <div class="space-y-3" id="faqContainer">
+      <details class="bg-gray-800 rounded-lg p-4 group" data-faq>
+        <summary
+          class="cursor-pointer font-semibold text-yellow-300 flex justify-between items-center"
+        >
+          How do I use speech input?
+          <span class="text-xs text-gray-400 group-open:text-green-400"
+            >(toggle)</span
+          >
+        </summary>
+        <p class="mt-3 text-sm text-gray-300">
+          Click the microphone, speak clearly. On iOS use Chrome/Edge. Interim
+          words appear, final transcript converts to signs.
+        </p>
+      </details>
+      <details class="bg-gray-800 rounded-lg p-4 group" data-faq>
+        <summary
+          class="cursor-pointer font-semibold text-yellow-300 flex justify-between items-center"
+        >
+          Why isn’t Safari speech working?
+          <span class="text-xs text-gray-400 group-open:text-green-400"
+            >(toggle)</span
+          >
+        </summary>
+        <p class="mt-3 text-sm text-gray-300">
+          Safari lacks reliable Web Speech API support. Install Chrome or Edge
+          on iOS for microphone features.
+        </p>
+      </details>
+      <details class="bg-gray-800 rounded-lg p-4 group" data-faq>
+        <summary
+          class="cursor-pointer font-semibold text-yellow-300 flex justify-between items-center"
+        >
+          Will offline mode be available?
+          <span class="text-xs text-gray-400 group-open:text-green-400"
+            >(toggle)</span
+          >
+        </summary>
+        <p class="mt-3 text-sm text-gray-300">
+          Yes. PWA support + cached sign videos are planned so classrooms with
+          limited connectivity can still function.
+        </p>
+      </details>
+      <details class="bg-gray-800 rounded-lg p-4 group" data-faq>
+        <summary
+          class="cursor-pointer font-semibold text-yellow-300 flex justify-between items-center"
+        >
+          Which languages are fully supported now?
+          <span class="text-xs text-gray-400 group-open:text-green-400"
+            >(toggle)</span
+          >
+        </summary>
+        <p class="mt-3 text-sm text-gray-300">
+          Currently 12+: Hindi, Tamil, Telugu, Bengali, Marathi, Gujarati,
+          Kannada, Malayalam, Punjabi, Odia, Assamese & English. More will be
+          added based on sign asset availability.
+        </p>
+      </details>
+      <details class="bg-gray-800 rounded-lg p-4 group" data-faq>
+        <summary
+          class="cursor-pointer font-semibold text-yellow-300 flex justify-between items-center"
+        >
+          Are my inputs stored or tracked?
+          <span class="text-xs text-gray-400 group-open:text-green-400"
+            >(toggle)</span
+          >
+        </summary>
+        <p class="mt-3 text-sm text-gray-300">
+          No personal speech/text is saved long‑term. Future saved sessions will
+          be an explicit opt‑in feature with transparency.
+        </p>
+      </details>
+      <details class="bg-gray-800 rounded-lg p-4 group" data-faq>
+        <summary
+          class="cursor-pointer font-semibold text-yellow-300 flex justify-between items-center"
+        >
+          Why do some words not have a sign video?
+          <span class="text-xs text-gray-400 group-open:text-green-400"
+            >(toggle)</span
+          >
+        </summary>
+        <p class="mt-3 text-sm text-gray-300">
+          ISL often uses conceptual keywords instead of every word. The system
+          extracts key signable terms. Missing assets are queued for creation.
+        </p>
+      </details>
+      <details class="bg-gray-800 rounded-lg p-4 group" data-faq>
+        <summary
+          class="cursor-pointer font-semibold text-yellow-300 flex justify-between items-center"
+        >
+          Does playback work on all mobile browsers?
+          <span class="text-xs text-gray-400 group-open:text-green-400"
+            >(toggle)</span
+          >
+        </summary>
+        <p class="mt-3 text-sm text-gray-300">
+          Yes for video playback. Microphone works best on Chrome (Android/iOS)
+          and Edge. Safari speech support is limited.
+        </p>
+      </details>
+      <details class="bg-gray-800 rounded-lg p-4 group" data-faq>
+        <summary
+          class="cursor-pointer font-semibold text-yellow-300 flex justify-between items-center"
+        >
+          How can I contribute sign assets?
+          <span class="text-xs text-gray-400 group-open:text-green-400"
+            >(toggle)</span
+          >
+        </summary>
+        <p class="mt-3 text-sm text-gray-300">
+          Soon a contribution guide will allow creators to submit vetted ISL
+          videos. Until then, use the contact form to express interest.
+        </p>
+      </details>
+      <details class="bg-gray-800 rounded-lg p-4 group" data-faq>
+        <summary
+          class="cursor-pointer font-semibold text-yellow-300 flex justify-between items-center"
+        >
+          Will there be an avatar instead of videos?
+          <span class="text-xs text-gray-400 group-open:text-green-400"
+            >(toggle)</span
+          >
+        </summary>
+        <p class="mt-3 text-sm text-gray-300">
+          Exploration phase includes procedural signing avatars. This depends on
+          quality, naturalness, and community validation.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section id="roadmap" class="space-y-6">
+    <h2 class="text-2xl font-bold text-yellow-400 text-center">Roadmap</h2>
+    <div class="grid md:grid-cols-3 gap-4 text-sm">
+      <div class="bg-gray-800 p-4 rounded-xl">
+        <h3 class="font-semibold text-yellow-300 mb-2">Phase 1 ✓</h3>
+        <ul class="text-gray-300 space-y-1">
+          <li>Multilingual input</li>
+          <li>Sign playback system</li>
+          <li>Speech transcription</li>
+          <li>Progress UI</li>
+        </ul>
+      </div>
+      <div class="bg-gray-800 p-4 rounded-xl">
+        <h3 class="font-semibold text-yellow-300 mb-2">Phase 2 →</h3>
+        <ul class="text-gray-300 space-y-1">
+          <li>Offline cache (PWA)</li>
+          <li>Saved sessions</li>
+          <li>Adaptive keyword logic</li>
+          <li>Accessibility audit tooling</li>
+        </ul>
+      </div>
+      <div class="bg-gray-800 p-4 rounded-xl">
+        <h3 class="font-semibold text-yellow-300 mb-2">
+          Phase 3 (Exploration)
+        </h3>
+        <ul class="text-gray-300 space-y-1">
+          <li>Avatar signing</li>
+          <li>Classroom collaboration</li>
+          <li>Regional sign variants</li>
+          <li>Learning analytics (opt‑in)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Thank You / CTA -->
+  <section
+    id="thanks"
+    class="text-center bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 p-6 rounded-xl space-y-3"
+  >
+    <h2 class="text-xl font-bold">🙏 Thank You!</h2>
+    <p class="font-medium">
+      Your interest supports accessible communication for everyone.
+    </p>
+  </section>
+
+  <!-- Contact CTA -->
+  <section id="contactcta" class="text-center space-y-4">
+    <h2 class="text-2xl font-bold text-yellow-400">Get Involved</h2>
+    <p class="text-gray-300 text-sm">
+      Have ideas, assets, or feedback? We welcome collaboration.
+    </p>
+    <a
+      href="{% url 'contact' %}"
+      class="inline-block bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold px-6 py-3 rounded-lg shadow transition"
+      >Contact Us</a
+    >
+  </section>
+</div>
+
+<!-- Structured Data for SEO -->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Sanket Bhasha",
+    "applicationCategory": "Education",
+    "operatingSystem": "Web",
+    "description": "Multilingual speech & text to Indian Sign Language converter supporting 12+ languages.",
+    "creator": {
+      "@type": "Organization",
+      "name": "Sanket Bhasha Team"
+    }
+  }
+</script>
+
+<!-- Minor JS Enhancements (optional: smooth anchor scroll offset) -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const navLinks = document.querySelectorAll(
+      'nav[aria-label="About navigation"] a'
+    );
+    navLinks.forEach((link) => {
+      link.addEventListener("click", (e) => {
+        const targetId = link.getAttribute("href").substring(1);
+        const el = document.getElementById(targetId);
+        if (el) {
+          e.preventDefault();
+          const y = el.getBoundingClientRect().top + window.scrollY - 70; // offset for sticky nav
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }
+      });
+    });
+
+    // Testimonial spotlight rotation
+    const spotlight = document.getElementById("testimonialSpotlight");
+    if (spotlight) {
+      const slides = Array.from(spotlight.querySelectorAll("[data-slide]"));
+      const progressBar = document.getElementById("testimonialProgress");
+      let idx = 0;
+      let intervalMs = 6000;
+      let timer;
+      function showSlide(i) {
+        slides.forEach((s, j) => s.classList.toggle("hidden", j !== i));
+        if (progressBar) {
+          progressBar.style.transition = "none";
+          progressBar.style.width = "0%";
+          // allow layout
+          requestAnimationFrame(() => {
+            progressBar.style.transition = `width ${intervalMs}ms linear`;
+            progressBar.style.width = "100%";
+          });
+        }
+      }
+      function start() {
+        showSlide(idx);
+        timer = setInterval(() => {
+          idx = (idx + 1) % slides.length;
+          showSlide(idx);
+        }, intervalMs);
+      }
+      function stop() {
+        clearInterval(timer);
+      }
+      spotlight.addEventListener("mouseenter", stop);
+      spotlight.addEventListener("mouseleave", () => {
+        stop();
+        start();
+      });
+      start();
+    }
+  });
+</script>
+{% endblock %}

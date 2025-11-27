@@ -1,0 +1,151 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="fade-in">
+  <!-- Hero Section -->
+  <div class="text-center mb-12">
+    <h1
+      class="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 mb-4"
+    >
+      Sanket Bhasha
+    </h1>
+    <h2 class="text-2xl md:text-3xl font-bold text-yellow-400 mb-4">
+      संकेत भाषा
+    </h2>
+    <p class="text-lg md:text-xl text-gray-300 mb-6">
+      Bridging Communication with AI & ISL
+    </p>
+    <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+      Transform your spoken words in 12+ Indian languages into beautiful Indian
+      Sign Language animations instantly.
+    </p>
+  </div>
+
+  <!-- Video Section (inline, custom-styled 3D stage like converter) -->
+  <div class="flex justify-center mb-12">
+    <div class="video-stage rounded-2xl shadow-2xl w-full max-w-3xl">
+      <video
+        id="homePreviewVideo"
+        class="video-surface"
+        preload="auto"
+        autoplay
+        loop
+        muted
+        playsinline
+        webkit-playsinline
+        disablepictureinpicture
+        controlslist="nodownload noplaybackrate noremoteplayback nofullscreen"
+        x-webkit-airplay="deny"
+        oncontextmenu="return false;"
+      >
+        <source src="{% static 'Hello.mp4' %}" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div class="video-glow" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="text-center">
+    <a
+      href="{% url 'animation' %}"
+      class="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-gray-900 font-bold py-4 px-8 rounded-full text-xl transition duration-300 transform hover:scale-105 shadow-lg"
+    >
+      🎤 Start Converting Now
+    </a>
+    <p class="text-gray-400 mt-4">
+      Click the button above to begin your speech-to-sign language journey
+    </p>
+  </div>
+
+  <!-- Features Section -->
+  <div class="mt-16 grid md:grid-cols-3 gap-8">
+    <div class="bg-gray-800 p-6 rounded-xl text-center">
+      <div class="text-4xl mb-4">🎙️</div>
+      <h3 class="text-xl font-bold mb-2 text-yellow-400">Voice Recognition</h3>
+      <p class="text-gray-300">
+        Advanced speech recognition technology converts your voice to text
+        instantly.
+      </p>
+    </div>
+    <div class="bg-gray-800 p-6 rounded-xl text-center">
+      <div class="text-4xl mb-4">🤝</div>
+      <h3 class="text-xl font-bold mb-2 text-yellow-400">Sign Language</h3>
+      <p class="text-gray-300">
+        Beautiful 3D animations demonstrate Indian Sign Language gestures
+        accurately.
+      </p>
+    </div>
+    <div class="bg-gray-800 p-6 rounded-xl text-center">
+      <div class="text-4xl mb-4">⚡</div>
+      <h3 class="text-xl font-bold mb-2 text-yellow-400">Real-time</h3>
+      <p class="text-gray-300">
+        Get instant translations with our fast and efficient processing system.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Prevent accidental fullscreen on iOS by blocking clicks on the video element
+  document.addEventListener("DOMContentLoaded", function () {
+    const vid = document.getElementById("homePreviewVideo");
+    if (!vid) return;
+    vid.addEventListener(
+      "click",
+      function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      },
+      true
+    );
+  });
+</script>
+
+<style>
+  /* Reuse the 3D-like stage styling from converter */
+  .video-stage {
+    position: relative;
+    background: radial-gradient(
+      120% 120% at 50% 40%,
+      rgba(16, 185, 129, 0.25) 0%,
+      rgba(59, 130, 246, 0.15) 35%,
+      rgba(17, 24, 39, 0.85) 80%
+    );
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .video-surface {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: perspective(1000px) rotateX(0.75deg);
+    filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.45));
+    border-radius: 1rem;
+  }
+  .video-glow {
+    position: absolute;
+    inset: -20%;
+    background: radial-gradient(
+      closest-side,
+      rgba(255, 255, 255, 0.08),
+      transparent 60%
+    );
+    pointer-events: none;
+    mix-blend-mode: screen;
+    animation: subtlePulse 6s ease-in-out infinite;
+  }
+  @keyframes subtlePulse {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.03);
+    }
+  }
+</style>
+
+{% endblock %}

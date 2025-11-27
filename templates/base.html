@@ -1,0 +1,730 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Convert speech and text from 12+ Indian languages into Indian Sign Language (ISL) animations. Free, real-time multilingual sign language converter."
+    />
+    <meta
+      name="keywords"
+      content="sign language, ISL, Indian Sign Language, speech to sign, text to sign, accessibility, Hindi, Tamil, Telugu, Bengali"
+    />
+    <meta name="author" content="Sanket Bhasha Team" />
+    <meta
+      property="og:title"
+      content="Sanket Bhasha - Multilingual Sign Language Converter"
+    />
+    <meta
+      property="og:description"
+      content="Convert speech and text from 12+ Indian languages into Indian Sign Language animations"
+    />
+    <meta property="og:type" content="website" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'SanketBhasha Logo.png' %}"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>
+      Sanket Bhasha - Audio To Sign Language Converter | 12+ Languages
+    </title>
+    <style>
+      /* Additional custom styles for animations */
+      .fade-in {
+        animation: fadeIn 0.5s ease-in;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .mic-icon {
+        transition: all 0.3s ease;
+      }
+      .mic-icon:hover {
+        transform: scale(1.1);
+      }
+      /* Logo styles */
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .logo-graphic {
+        display: flex;
+        align-items: center;
+      }
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .brand-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #1f2937;
+        line-height: 1.2;
+      }
+      .brand-subtitle {
+        font-size: 1rem;
+        color: #4b5563;
+        font-weight: 500;
+      }
+      .brand-tagline {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-style: italic;
+      }
+      /* Mobile menu styles */
+      .mobile-menu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+      }
+      .mobile-menu.active {
+        max-height: 500px;
+      }
+      /* Hamburger animation */
+      .hamburger {
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+      .hamburger:hover {
+        transform: scale(1.1);
+      }
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+      /* Loading spinner */
+      .spinner {
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid #facc15;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      /* Tooltip styles */
+      .tooltip {
+        position: relative;
+        display: inline-block;
+      }
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #1f2937;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 8px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 12px;
+      }
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+      /* Better focus states for accessibility */
+      button:focus,
+      a:focus,
+      input:focus,
+      select:focus {
+        outline: 2px solid #facc15;
+        outline-offset: 2px;
+      }
+      /* Pulse animation for notifications */
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+      .pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      /* Toast notification styles */
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideInRight 0.3s ease-out;
+        max-width: 400px;
+      }
+      .toast.success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      }
+      .toast.error {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      }
+      .toast.info {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      }
+      .toast.warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      }
+      @keyframes slideInRight {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes slideOutRight {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+      }
+      .toast.hiding {
+        animation: slideOutRight 0.3s ease-out forwards;
+      }
+      /* Slide-in animation for page content */
+      @keyframes slideInUp {
+        from {
+          transform: translateY(30px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .slide-in-up {
+        animation: slideInUp 0.6s ease-out;
+      }
+
+      /* Mobile Responsive Adjustments */
+      @media (max-width: 640px) {
+        .toast {
+          top: 10px;
+          right: 10px;
+          left: 10px;
+          max-width: calc(100% - 20px);
+          padding: 12px 16px;
+          font-size: 14px;
+        }
+
+        /* Smaller logo on mobile */
+        .logo-graphic img {
+          height: 48px !important;
+        }
+
+        .brand-title {
+          font-size: 1.125rem !important;
+        }
+
+        .brand-subtitle {
+          font-size: 0.875rem !important;
+        }
+
+        .brand-tagline {
+          font-size: 0.625rem !important;
+        }
+
+        /* Hide scroll to top button on very small screens */
+        body > button[aria-label="Scroll to top"] {
+          width: 40px;
+          height: 40px;
+          bottom: 16px;
+          right: 16px;
+          font-size: 16px;
+        }
+      }
+
+      /* Ensure container has proper padding on mobile */
+      @media (max-width: 768px) {
+        .container {
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-gray-900 to-slate-800 text-white min-h-screen"
+  >
+    <!-- Skip link for accessibility -->
+    <a
+      href="#mainContent"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-yellow-400 text-gray-900 px-4 py-2 rounded shadow z-50"
+      >Skip to main content</a
+    >
+    <!-- Aria live region for dynamic updates (toast fallback) -->
+    <div
+      id="live-region"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-yellow-400 to-orange-400 shadow-lg">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+          <!-- Logo and Brand (Clickable) -->
+          <a
+            href="{% url 'home' %}"
+            class="logo-container cursor-pointer hover:opacity-90 transition duration-300"
+            title="Go to Home"
+          >
+            <div class="logo-graphic">
+              <img
+                src=" {% static 'SanketBhasha Logo.png' %} "
+                alt="Sanket Bhasha Logo"
+                class="h-16 w-auto object-contain"
+              />
+            </div>
+            <div class="brand-text">
+              <div class="brand-title">Sanket Bhasha</div>
+              <div class="brand-subtitle">संकेत भाषा</div>
+              <div class="brand-tagline">
+                Bridging Communication with AI & ISL
+              </div>
+            </div>
+          </a>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <a
+                href="{% url 'home' %}"
+                class="text-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-300"
+                >Home</a
+              >
+              <a
+                href="{% url 'animation' %}"
+                class="text-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-300"
+                >Converter</a
+              >
+              {% if not user.is_authenticated %}
+              <a
+                href="{% url 'signup' %}"
+                class="text-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-300"
+                >Sign Up</a
+              >
+              {% endif %} {% if user.is_authenticated %}
+              <a
+                href="{% url 'logout' %}"
+                class="text-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-300"
+                >Log Out</a
+              >
+              {% else %}
+              <a
+                href="{% url 'login' %}"
+                class="text-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-300"
+                >Log In</a
+              >
+              {% endif %}
+              <a
+                href="{% url 'contact' %}"
+                class="text-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-300"
+                >Contact</a
+              >
+              <a
+                href="{% url 'about' %}"
+                class="text-gray-900 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-300"
+                >About</a
+              >
+            </div>
+          </div>
+
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <button
+              id="mobile-menu-button"
+              type="button"
+              aria-controls="mobile-menu"
+              aria-expanded="false"
+              class="hamburger text-gray-900 hover:text-white focus:outline-none focus:text-white"
+            >
+              <svg
+                class="h-6 w-6"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  id="menu-icon"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div
+          id="mobile-menu"
+          class="mobile-menu md:hidden hidden"
+          role="menu"
+          aria-labelledby="mobile-menu-button"
+        >
+          <div class="px-2 pt-2 pb-3 space-y-1">
+            <a
+              href="{% url 'home' %}"
+              class="text-gray-900 hover:bg-yellow-500 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition duration-300"
+              >Home</a
+            >
+            <a
+              href="{% url 'animation' %}"
+              class="text-gray-900 hover:bg-yellow-500 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition duration-300"
+              >Converter</a
+            >
+            {% if not user.is_authenticated %}
+            <a
+              href="{% url 'signup' %}"
+              class="text-gray-900 hover:bg-yellow-500 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition duration-300"
+              >Sign Up</a
+            >
+            {% endif %} {% if user.is_authenticated %}
+            <a
+              href="{% url 'logout' %}"
+              class="text-gray-900 hover:bg-yellow-500 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition duration-300"
+              >Log Out</a
+            >
+            {% else %}
+            <a
+              href="{% url 'login' %}"
+              class="text-gray-900 hover:bg-yellow-500 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition duration-300"
+              >Log In</a
+            >
+            {% endif %}
+            <a
+              href="{% url 'contact' %}"
+              class="text-gray-900 hover:bg-yellow-500 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition duration-300"
+              >Contact</a
+            >
+            <a
+              href="{% url 'about' %}"
+              class="text-gray-900 hover:bg-yellow-500 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition duration-300"
+              >About</a
+            >
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main id="mainContent" class="container mx-auto px-4 py-8">
+      {% block content %} {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-12">
+      <div class="container mx-auto px-4 py-8">
+        <div class="grid md:grid-cols-3 gap-8 mb-6">
+          <!-- About Section -->
+          <div>
+            <h3 class="text-yellow-400 font-bold mb-3">About Sanket Bhasha</h3>
+            <p class="text-gray-400 text-sm">
+              Making communication accessible for everyone through Indian Sign
+              Language with support for 12+ regional languages.
+            </p>
+          </div>
+          <!-- Quick Links -->
+          <div>
+            <h3 class="text-yellow-400 font-bold mb-3">Quick Links</h3>
+            <ul class="text-gray-400 text-sm space-y-2">
+              <li>
+                <a
+                  href="{% url 'home' %}"
+                  class="hover:text-yellow-400 transition"
+                  >Home</a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'animation' %}"
+                  class="hover:text-yellow-400 transition"
+                  >Converter</a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'about' %}"
+                  class="hover:text-yellow-400 transition"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'contact' %}"
+                  class="hover:text-yellow-400 transition"
+                  >Contact</a
+                >
+              </li>
+            </ul>
+          </div>
+          <!-- Languages -->
+          <div>
+            <h3 class="text-yellow-400 font-bold mb-3">Supported Languages</h3>
+            <p class="text-gray-400 text-sm">
+              English, हिंदी, मराठी, தமிழ், తెలుగు, বাংলা, ಕನ್ನಡ, ગુજરાતી,
+              മലയാളം, ਪੰਜਾਬੀ, ଓଡ଼ିଆ, অসমীয়া
+            </p>
+          </div>
+        </div>
+        <div class="border-t border-gray-700 pt-6 text-center">
+          <p class="text-gray-400 text-sm">
+            &copy; 2025 Sanket Bhasha (संकेत भाषा). Made with ❤️ for
+            accessibility. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Mobile Menu Toggle Script -->
+    <script>
+      // Respect reduced motion preferences
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      if (prefersReducedMotion) {
+        document.documentElement.classList.add("reduce-motion");
+        // Remove or neutralize animation utility classes
+        document
+          .querySelectorAll(".fade-in,.slide-in-up,.video-glow")
+          .forEach((el) => {
+            el.style.animation = "none";
+            el.classList.remove("fade-in", "slide-in-up");
+          });
+      }
+      document.addEventListener("DOMContentLoaded", function () {
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const menuIconPath = document.getElementById("menu-icon");
+        let lastFocusedElement = null;
+
+        // Focusable selectors inside mobile menu
+        const focusableSelector = "a[href], button:not([disabled])";
+        let focusableEls = [];
+        let firstFocusable = null;
+        let lastFocusable = null;
+
+        function openMenu() {
+          mobileMenu.classList.add("active");
+          mobileMenu.classList.remove("hidden");
+          mobileMenuButton.setAttribute("aria-expanded", "true");
+          document.body.style.overflow = "hidden"; // prevent background scroll
+          // Change icon to X
+          if (menuIconPath) {
+            menuIconPath.setAttribute("d", "M6 6l12 12M6 18L18 6");
+          }
+          // Save focus
+          lastFocusedElement = document.activeElement;
+          // Prepare focus trap
+          focusableEls = Array.from(
+            mobileMenu.querySelectorAll(focusableSelector)
+          );
+          firstFocusable = focusableEls[0];
+          lastFocusable = focusableEls[focusableEls.length - 1];
+          if (firstFocusable) firstFocusable.focus();
+        }
+
+        function closeMenu() {
+          mobileMenu.classList.remove("active");
+          mobileMenu.classList.add("hidden");
+          mobileMenuButton.setAttribute("aria-expanded", "false");
+          document.body.style.overflow = "";
+          // Revert icon to hamburger
+          if (menuIconPath) {
+            menuIconPath.setAttribute("d", "M4 6h16M4 12h16M4 18h16");
+          }
+          // Restore focus
+          if (lastFocusedElement) lastFocusedElement.focus();
+        }
+
+        if (mobileMenuButton && mobileMenu) {
+          // Toggle on click (supports touch as well)
+          mobileMenuButton.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const isOpen =
+              mobileMenu.classList.contains("active") &&
+              !mobileMenu.classList.contains("hidden");
+            if (isOpen) {
+              closeMenu();
+            } else {
+              openMenu();
+            }
+          });
+
+          // Close menu when clicking on a link
+          const menuLinks = mobileMenu.querySelectorAll("a");
+          menuLinks.forEach((link) => {
+            link.addEventListener("click", function () {
+              closeMenu();
+            });
+          });
+
+          // Close menu when clicking outside
+          document.addEventListener("click", function (event) {
+            const isClickInside =
+              mobileMenuButton.contains(event.target) ||
+              mobileMenu.contains(event.target);
+            if (
+              !isClickInside &&
+              mobileMenu.classList.contains("active") &&
+              !mobileMenu.classList.contains("hidden")
+            ) {
+              closeMenu();
+            }
+          });
+
+          // Keyboard handling (Escape & focus trap)
+          document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && mobileMenu.classList.contains("active")) {
+              closeMenu();
+            }
+            if (e.key === "Tab" && mobileMenu.classList.contains("active")) {
+              // Focus trap
+              if (focusableEls.length === 0) {
+                e.preventDefault();
+                mobileMenuButton.focus();
+                return;
+              }
+              if (e.shiftKey) {
+                if (document.activeElement === firstFocusable) {
+                  e.preventDefault();
+                  lastFocusable.focus();
+                }
+              } else {
+                if (document.activeElement === lastFocusable) {
+                  e.preventDefault();
+                  firstFocusable.focus();
+                }
+              }
+            }
+          });
+        }
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener("keydown", function (e) {
+        // Alt + H = Home
+        if (e.altKey && e.key === "h") {
+          e.preventDefault();
+          window.location.href = "{% url 'home' %}";
+        }
+        // Alt + C = Converter
+        if (e.altKey && e.key === "c") {
+          e.preventDefault();
+          window.location.href = "{% url 'animation' %}";
+        }
+      });
+
+      // Scroll to top button
+      const scrollBtn = document.createElement("button");
+      scrollBtn.innerHTML = "↑";
+      scrollBtn.className =
+        "fixed bottom-8 right-8 bg-yellow-400 text-gray-900 w-12 h-12 rounded-full shadow-lg hover:bg-yellow-500 transition duration-300 hidden z-50 font-bold text-xl";
+      scrollBtn.setAttribute("aria-label", "Scroll to top");
+      scrollBtn.style.display = "none";
+      document.body.appendChild(scrollBtn);
+
+      window.addEventListener("scroll", function () {
+        if (window.pageYOffset > 300) {
+          scrollBtn.style.display = "block";
+        } else {
+          scrollBtn.style.display = "none";
+        }
+      });
+
+      scrollBtn.addEventListener("click", function () {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      // Toast notification system (global function)
+      window.showToast = function (message, type = "info", duration = 3000) {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+
+        // Icon based on type
+        const icons = {
+          success: "✓",
+          error: "✕",
+          warning: "⚠",
+          info: "ℹ",
+        };
+
+        toast.innerHTML = `
+            <div style="font-size: 24px;">${icons[type] || icons.info}</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; margin-bottom: 4px;">${
+                type.charAt(0).toUpperCase() + type.slice(1)
+              }</div>
+              <div style="font-size: 14px; opacity: 0.95;">${message}</div>
+            </div>
+            <button onclick="this.parentElement.remove()" style="background: rgba(255,255,255,0.2); border: none; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1;">×</button>
+          `;
+
+        document.body.appendChild(toast);
+        // Update live region for screen readers
+        const liveRegion = document.getElementById("live-region");
+        if (liveRegion) {
+          liveRegion.textContent = message;
+        }
+
+        // Auto-remove after duration
+        setTimeout(() => {
+          toast.classList.add("hiding");
+          setTimeout(() => toast.remove(), 300);
+        }, duration);
+      };
+
+      // Show welcome toast on page load (only once per session)
+      if (!sessionStorage.getItem("welcomeShown")) {
+        setTimeout(() => {
+          showToast(
+            "Welcome to Sanket Bhasha! 🌟 Convert speech to sign language in 12+ languages.",
+            "success",
+            4000
+          );
+          sessionStorage.setItem("welcomeShown", "true");
+        }, 1000);
+      }
+    </script>
+  </body>
+</html>
