@@ -20,8 +20,10 @@ import nltk
 
 # Set NLTK data path for production
 NLTK_DATA_DIR = os.path.join(BASE_DIR, 'nltk_data')
-nltk.data.path.insert(0, '/opt/render/nltk_data')  # Render's NLTK data location
+# Ensure project nltk_data is first in search path
 nltk.data.path.insert(0, NLTK_DATA_DIR)
+if os.path.exists('/opt/render/nltk_data'):
+    nltk.data.path.insert(0, '/opt/render/nltk_data')
 
 # Only download if not in production (data is downloaded in build.sh)
 if config('DEBUG', default=True, cast=bool):
