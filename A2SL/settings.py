@@ -17,12 +17,21 @@ from decouple import config, Csv
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Below code added by RanjeetKumbhar01
 import nltk
+
+# Set NLTK data path for production
 NLTK_DATA_DIR = os.path.join(BASE_DIR, 'nltk_data')
-nltk.data.path.append(NLTK_DATA_DIR)
-# download nltk utilities
-nltk.download('averaged_perceptron_tagger')
-nltk.download('wordnet')
-nltk.download('omw-1.4')
+nltk.data.path.insert(0, '/opt/render/nltk_data')  # Render's NLTK data location
+nltk.data.path.insert(0, NLTK_DATA_DIR)
+
+# Only download if not in production (data is downloaded in build.sh)
+if config('DEBUG', default=True, cast=bool):
+    try:
+        nltk.download('punkt', quiet=True)
+        nltk.download('averaged_perceptron_tagger', quiet=True)
+        nltk.download('wordnet', quiet=True)
+        nltk.download('omw-1.4', quiet=True)
+    except:
+        pass
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
