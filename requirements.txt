@@ -9,7 +9,8 @@ tqdm==4.64.1
 setuptools==67.8.0
 
 # Multilingual Translation Support
-googletrans==4.0.0rc1
+googletrans==3.1.0a0
+httpx==0.13.3
 requests>=2.25.1
 langdetect>=1.0.9
 
