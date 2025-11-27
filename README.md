@@ -1,129 +1,180 @@
-# 🌍 Multilingual Text/Voice to Indian Sign Language (ISL) Converter
+# 🌍 Sanket Bhasha - Multilingual Speech/Text to Sign Language Converter
 
-A Django-based web app that converts text and voice from 12+ Indian regional languages into Indian Sign Language (ISL) animations with real-time translation, NLP processing, and audio verification.
+[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://sanket-bhasha-isl.onrender.com)
+[![Python](https://img.shields.io/badge/python-3.11.9-blue)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/django-4.1.13-green)](https://www.djangoproject.com/)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+Convert text and voice from **12+ Indian languages** into Indian Sign Language (ISL) animations with real-time translation and natural language processing.
+
+🔗 **Live Application**: [https://sanket-bhasha-isl.onrender.com](https://sanket-bhasha-isl.onrender.com)
 
 ## ✨ Features
 
-- 12+ language input with auto-detection
-- Speech-to-text and Text-to-Speech (TTS)
-- Real-time translation (googletrans)
-- NLP pipeline (tokenize, lemmatize, POS tagging)
-- ISL animation playback from local assets
-- User auth (signup/login), admin dashboard
+- 🗣️ **Multilingual Support** - Hindi, Gujarati, Marathi, Bengali, Tamil, Telugu, Kannada, Malayalam, Punjabi, Urdu, and more
+- 🎤 **Speech-to-Text** - Real-time voice input with language detection
+- 🔊 **Text-to-Speech** - Audio playback in multiple Indian languages
+- 🤖 **NLP Processing** - Advanced tokenization, lemmatization, and POS tagging
+- 🎬 **ISL Animations** - 150+ sign language video animations
+- 🔐 **User Authentication** - Secure signup/login system
+- 📱 **Responsive Design** - Mobile-friendly interface with Tailwind CSS
 
-## 🧰 Tech Stack
+## 🛠️ Tech Stack
 
-- Backend: Python 3.8+, Django 4.1+
-- NLP: NLTK, langdetect
-- Translation: googletrans (client)
-- Frontend: Django templates, Tailwind CSS
-- Database: SQLite (dev)
+- **Backend**: Django 4.1.13, Python 3.11.9
+- **NLP**: NLTK, langdetect, WordNet
+- **Translation**: googletrans 3.1.0a0
+- **Frontend**: Tailwind CSS, JavaScript
+- **Database**: SQLite (dev), PostgreSQL (production)
+- **Deployment**: Render.com, Gunicorn, Whitenoise
 
-## 🚀 Quickstart
+## 🚀 Local Development
+
+### Prerequisites
+
+- Python 3.11.9+
+- pip
+
+### Setup
 
 ```bash
-# 1) Create venv
-python -m venv venv
-# Windows
-venv\Scripts\activate
-# Linux/Mac
-# source venv/bin/activate
+# 1. Clone repository
+git clone https://github.com/dikeshganboi/Sanket-Bhasha-Multilingual-Speech-Text-to-Sign-Language-Converter.git
+cd Sanket-Bhasha-Multilingual-Speech-Text-to-Sign-Language-Converter
 
-# 2) Install deps
+# 2. Create virtual environment
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/Mac
+
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# 3) (optional) Download NLTK corpora
-python -c "import nltk; [nltk.download(x) for x in ['punkt','stopwords','averaged_perceptron_tagger','wordnet','omw-1.4']]"
+# 4. Download NLTK data
+python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('averaged_perceptron_tagger'); nltk.download('wordnet'); nltk.download('omw-1.4')"
 
-# 4) Configure env
-copy .env.example .env   # on Windows
-# cp .env.example .env   # on Linux/Mac
+# 5. Setup environment variables
+copy .env.example .env  # Windows
+# cp .env.example .env  # Linux/Mac
+# Edit .env and add your SECRET_KEY
 
-# 5) Migrate DB and run
+# 6. Run migrations
 python manage.py migrate
+
+# 7. Create superuser (optional)
+python manage.py createsuperuser
+
+# 8. Collect static files
+python manage.py collectstatic
+
+# 9. Run development server
 python manage.py runserver
 ```
 
-Admin panel: `http://localhost:8000/admin/`
-
-Create admin:
-
-```bash
-python manage.py createsuperuser
-```
+Visit `http://localhost:8000` to access the application.
 
 ## 📂 Project Structure
 
 ```
-A2SL/                    # Django project (settings, urls, views, translation)
-assets/                  # ISL animation videos (mp4)
-static/                  # CSS/JS/images
+A2SL/                    # Django project configuration
+  ├── settings.py        # Project settings
+  ├── urls.py            # URL routing
+  ├── views.py           # View logic
+  └── translation_service.py  # Translation utilities
+assets/                  # ISL animation videos (150+ MP4 files)
+static/                  # Static assets (CSS, images)
 templates/               # HTML templates
-scripts/                 # Utility scripts (DB/user helpers)
+  ├── home.html          # Landing page
+  ├── animation.html     # Main converter interface
+  ├── login.html         # Authentication
+  └── signup.html
 tests/                   # Test suite
-README.md                # This file
-requirements.txt         # Dependencies
+requirements.txt         # Python dependencies
+Procfile                 # Deployment configuration
+runtime.txt              # Python version
+build.sh                 # Build script
 ```
 
 ## 🧪 Testing
 
 ```bash
+# Run all tests
 pytest
-# or
-python tests/run_tests.py
+
+# Run specific test file
+pytest tests/test_integration.py
+
+# Run with coverage
+pytest --cov=A2SL
 ```
 
-## 🔒 Environment Variables (.env)
+## 🔒 Environment Variables
 
-See `.env.example` for all variables.
+Create `.env` file based on `.env.example`:
 
-Key settings:
-
-- `SECRET_KEY` (required in production)
-- `DEBUG` (True/False)
-- `ALLOWED_HOSTS` (CSV list)
-- `DATABASE_ENGINE`, `DATABASE_NAME`
+```env
+SECRET_KEY=your-secret-key-here
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+DATABASE_URL=sqlite:///db.sqlite3  # or PostgreSQL URL
+```
 
 ## 🚀 Production Deployment
 
-This project is **production-ready** with:
+Deployed on [Render.com](https://render.com) with:
 
-- ✅ Gunicorn WSGI server
-- ✅ Whitenoise static file management
-- ✅ Environment variable configuration
-- ✅ PostgreSQL support
-- ✅ Security settings enabled
+- ✅ **Gunicorn** - Production WSGI server
+- ✅ **Whitenoise** - Static file serving
+- ✅ **PostgreSQL** - Production database support
+- ✅ **SSL/HTTPS** - Secure connections
+- ✅ **Auto-deploy** - CI/CD from GitHub
 
-### Quick Deploy
+### Deploy to Render
 
-**See detailed guides:**
+1. Fork this repository
+2. Create new Web Service on [Render](https://render.com)
+3. Connect your GitHub repository
+4. Render will auto-detect settings from `render.yaml`
+5. Add environment variables:
+   - `SECRET_KEY` - Generate secure key
+   - `DEBUG=False`
+   - `ALLOWED_HOSTS=your-app.onrender.com`
+6. Deploy automatically!
 
-- `DEPLOYMENT_COMPLETE.md` - Status and overview
-- `DEPLOYMENT_GUIDE.md` - Comprehensive deployment instructions
-- `QUICK_DEPLOY.md` - Quick reference commands
-
-**Recommended Platforms:**
-
-- [Render.com](https://render.com) - Free tier, easy setup
-- [Railway.app](https://railway.app) - Modern, simple deployment
-- [Heroku](https://heroku.com) - Traditional, reliable
-
-### One-Click Deploy to Render
+### One-Click Deploy
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
-Use the included `render.yaml` for automatic configuration.
-
-## 📜 License
-
-See `LICENSE`.
-
 ## 🤝 Contributing
 
-- Fork, create feature branch, open PR
-- Add tests where possible
-- Follow PEP8 and keep changes focused
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+**Dikesh Ganboi**
+
+- GitHub: [@dikeshganboi](https://github.com/dikeshganboi)
+- Project: [Sanket Bhasha ISL Converter](https://github.com/dikeshganboi/Sanket-Bhasha-Multilingual-Speech-Text-to-Sign-Language-Converter)
+
+## 🙏 Acknowledgments
+
+- Indian Sign Language video assets
+- NLTK and NLP community
+- Django and Python communities
+- All contributors and users
 
 ---
 
-For detailed feature docs, see `docs/` and `README_MULTILINGUAL.md`.
+⭐ **Star this repo** if you find it helpful!
+
+🌐 **Live Demo**: [https://sanket-bhasha-isl.onrender.com](https://sanket-bhasha-isl.onrender.com)
